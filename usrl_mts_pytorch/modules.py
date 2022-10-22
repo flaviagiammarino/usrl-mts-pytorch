@@ -210,4 +210,4 @@ class CausalCNNEncoder(torch.nn.Module):
         )
 
     def forward(self, x):
-        return self.network(x)
+        return self.network(x.float())

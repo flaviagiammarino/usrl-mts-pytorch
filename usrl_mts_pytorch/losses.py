@@ -17,7 +17,7 @@
 
 
 import torch
-import numpy
+import numpy as np
 
 
 class TripletLoss(torch.nn.modules.loss._Loss):
@@ -35,7 +35,7 @@ class TripletLoss(torch.nn.modules.loss._Loss):
     The triplets are chosen in the following manner. First the size of the
     positive and negative samples are randomly chosen in the range of lengths
     of time series in the dataset. The size of the anchor time series is
-    randomly chosen with the same length upper bound but the the length of the
+    randomly chosen with the same length upper bound but the length of the
     positive samples as lower bound. An anchor of this length is then chosen
     randomly in the given time series of the train set, and positive samples
     are randomly chosen among subseries of the anchor. Finally, negative
@@ -52,7 +52,7 @@ class TripletLoss(torch.nn.modules.loss._Loss):
         super(TripletLoss, self).__init__()
         self.compared_length = compared_length
         if self.compared_length is None:
-            self.compared_length = numpy.inf
+            self.compared_length = np.inf
         self.nb_random_samples = nb_random_samples
         self.negative_penalty = negative_penalty
 
@@ -64,25 +64,25 @@ class TripletLoss(torch.nn.modules.loss._Loss):
         # For each batch element, we pick nb_random_samples possible random
         # time series in the training set (choice of batches from where the
         # negative examples will be sampled)
-        samples = numpy.random.choice(
+        samples = np.random.choice(
             train_size, size=(self.nb_random_samples, batch_size)
         )
         samples = torch.LongTensor(samples)
 
         # Choice of length of positive and negative samples
-        length_pos_neg = numpy.random.randint(1, high=length + 1)
+        length_pos_neg = np.random.randint(1, high=length + 1)
 
         # We choose for each batch example a random interval in the time
         # series, which is the 'anchor'
-        random_length = numpy.random.randint(
+        random_length = np.random.randint(
             length_pos_neg, high=length + 1
         )  # Length of anchors
-        beginning_batches = numpy.random.randint(
+        beginning_batches = np.random.randint(
             0, high=length - random_length + 1, size=batch_size
         )  # Start of anchors
 
         # The positive samples are chosen at random in the chosen anchors
-        beginning_samples_pos = numpy.random.randint(
+        beginning_samples_pos = np.random.randint(
             0, high=random_length - length_pos_neg + 1, size=batch_size
         )  # Start of positive samples in the anchors
         # Start of positive samples in the batch examples
@@ -92,7 +92,7 @@ class TripletLoss(torch.nn.modules.loss._Loss):
 
         # We randomly choose nb_random_samples potential negative samples for
         # each batch example
-        beginning_samples_neg = numpy.random.randint(
+        beginning_samples_neg = np.random.randint(
             0, high=length - length_pos_neg + 1,
             size=(self.nb_random_samples, batch_size)
         )
@@ -173,7 +173,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
     The triplets are chosen in the following manner. First the sizes of
     positive and negative samples are randomly chosen in the range of lengths
     of time series in the dataset. The size of the anchor time series is
-    randomly chosen with the same length upper bound but the the length of the
+    randomly chosen with the same length upper bound but the length of the
     positive samples as lower bound. An anchor of this length is then chosen
     randomly in the given time series of the train set, and positive samples
     are randomly chosen among subseries of the anchor. Finally, negative
@@ -190,7 +190,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
         super(TripletLossVaryingLength, self).__init__()
         self.compared_length = compared_length
         if self.compared_length is None:
-            self.compared_length = numpy.inf
+            self.compared_length = np.inf
         self.nb_random_samples = nb_random_samples
         self.negative_penalty = negative_penalty
 
@@ -202,7 +202,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
         # For each batch element, we pick nb_random_samples possible random
         # time series in the training set (choice of batches from where the
         # negative examples will be sampled)
-        samples = numpy.random.choice(
+        samples = np.random.choice(
             train_size, size=(self.nb_random_samples, batch_size)
         )
         samples = torch.LongTensor(samples)
@@ -212,7 +212,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
             lengths_batch = max_length - torch.sum(
                 torch.isnan(batch[:, 0]), 1
             ).data.cpu().numpy()
-            lengths_samples = numpy.empty(
+            lengths_samples = np.empty(
                 (self.nb_random_samples, batch_size), dtype=int
             )
             for i in range(self.nb_random_samples):
@@ -221,33 +221,33 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
                 ).data.cpu().numpy()
 
         # Choice of lengths of positive and negative samples
-        lengths_pos = numpy.empty(batch_size, dtype=int)
-        lengths_neg = numpy.empty(
+        lengths_pos = np.empty(batch_size, dtype=int)
+        lengths_neg = np.empty(
             (self.nb_random_samples, batch_size), dtype=int
         )
         for j in range(batch_size):
-            lengths_pos[j] = numpy.random.randint(
+            lengths_pos[j] = np.random.randint(
                 1, high=min(self.compared_length, lengths_batch[j]) + 1
             )
             for i in range(self.nb_random_samples):
-                lengths_neg[i, j] = numpy.random.randint(
+                lengths_neg[i, j] = np.random.randint(
                     1,
                     high=min(self.compared_length, lengths_samples[i, j]) + 1
                 )
 
         # We choose for each batch example a random interval in the time
         # series, which is the 'anchor'
-        random_length = numpy.array([numpy.random.randint(
+        random_length = np.array([np.random.randint(
             lengths_pos[j],
             high=min(self.compared_length, lengths_batch[j]) + 1
         ) for j in range(batch_size)])  # Length of anchors
-        beginning_batches = numpy.array([numpy.random.randint(
+        beginning_batches = np.array([np.random.randint(
             0, high=lengths_batch[j] - random_length[j] + 1
         ) for j in range(batch_size)])  # Start of anchors
 
         # The positive samples are chosen at random in the chosen anchors
         # Start of positive samples in the anchors
-        beginning_samples_pos = numpy.array([numpy.random.randint(
+        beginning_samples_pos = np.array([np.random.randint(
             0, high=random_length[j] - lengths_pos[j] + 1
         ) for j in range(batch_size)])
         # Start of positive samples in the batch examples
@@ -257,7 +257,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
 
         # We randomly choose nb_random_samples potential negative samples for
         # each batch example
-        beginning_samples_neg = numpy.array([[numpy.random.randint(
+        beginning_samples_neg = np.array([[np.random.randint(
             0, high=lengths_samples[i, j] - lengths_neg[i, j] + 1
         ) for j in range(batch_size)] for i in range(self.nb_random_samples)])
 
