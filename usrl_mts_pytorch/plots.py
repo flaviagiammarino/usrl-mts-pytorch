@@ -68,7 +68,7 @@ def plot(x, y):
                     showlegend=False,
                     mode='lines',
                     line=dict(
-                        color='rgba(194, 194, 194, 0.5)',
+                        color='rgba(194, 194, 194, 0.4)',
                         width=0.1
                     )
                 ),
@@ -84,7 +84,7 @@ def plot(x, y):
                 legendgroup='Average',
                 mode='lines',
                 line=dict(
-                    color='rgb(207, 34, 46)',
+                    color='#0550ae',
                     width=1
                 )
             ),
