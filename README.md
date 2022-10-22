@@ -27,8 +27,8 @@ from usrl_mts_pytorch.model import Encoder
 from usrl_mts_pytorch.plots import plot
 
 # Generate the time series
-N = 100  # number of time series
-C = 2    # number of dimensions of each time series
+N = 50   # number of time series
+C = 10   # number of dimensions of each time series
 L = 200  # number of samples of each time series
 x = np.zeros((N, C, L))
 t = np.linspace(0, 1, L)
@@ -43,14 +43,14 @@ encoder = Encoder(
     blocks=2,
     filters=8,
     kernel_size=3,
-    encoder_length=8,
+    encoder_length=5,
     output_length=10,
 )
 
 encoder.fit(
     negative_samples=10,
-    learning_rate=0.001,
-    batch_size=32,
+    learning_rate=0.01,
+    batch_size=64,
     epochs=50,
     verbose=True
 )
