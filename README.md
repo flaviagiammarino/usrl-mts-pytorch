@@ -2,8 +2,6 @@
 
 ![license](https://img.shields.io/github/license/flaviagiammarino/usrl-mts-pytorch?color=green)
 ![languages](https://img.shields.io/github/languages/top/flaviagiammarino/usrl-mts-pytorch?color=blue)
-![stars](https://img.shields.io/github/stars/flaviagiammarino/usrl-mts-pytorch?color=yellow)
-![forks](https://img.shields.io/github/forks/flaviagiammarino/usrl-mts-pytorch?color=orange)
 
 PyTorch implementation of unsupervised temporal convolutional network encoder with triplet loss for time series representation 
 learning introduced in Franceschi, J.Y., Dieuleveut, A. and Jaggi, M., 2019. Unsupervised scalable representation learning for 
