@@ -9,7 +9,6 @@ multivariate time series. *Advances in neural information processing systems*, 3
 
 Adapted from: [https://github.com/White-Link/UnsupervisedScalableRepresentationLearningTimeSeries](https://github.com/White-Link/UnsupervisedScalableRepresentationLearningTimeSeries).
 
-
 ## Dependencies
 ```bash
 numpy==1.23.1

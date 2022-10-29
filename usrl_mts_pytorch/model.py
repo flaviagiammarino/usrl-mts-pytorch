@@ -51,10 +51,10 @@ class Encoder():
         # Scale the inputs.
         self.x_min = np.nanmin(x, axis=0, keepdims=True)
         self.x_max = np.nanmax(x, axis=0, keepdims=True)
-        self.x = (x - self.x_min) / (self.x_max - self.x_min)
+        x = (x - self.x_min) / (self.x_max - self.x_min)
  
         # Build the model.
-        self.model = CausalCNNEncoder(
+        model = CausalCNNEncoder(
             in_channels=x.shape[1],
             channels=filters,
             depth=blocks,
@@ -64,11 +64,17 @@ class Encoder():
         )
 
         # Check if the inputs have varying length.
-        self.varying = np.isnan(self.x).any()
+        self.varying = np.isnan(x).any()
         
         # Check if GPU is available.
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
+        # Save the inputs.
+        self.x = torch.from_numpy(x).to(self.device)
+
+        # Save the model.
+        self.model = model.to(self.device)
+        
     def fit(self,
             negative_samples,
             learning_rate,
@@ -96,16 +102,10 @@ class Encoder():
         verbose: bool.
             True if the training history should be printed in the console, False otherwise.
         '''
-
-        print(f'Training on {self.device}.')
-        self.model.to(self.device)
         
-        # Generate the training dataset.
-        dataset = torch.from_numpy(self.x).to(self.device)
-
         # Generate the training batches.
         batches = torch.utils.data.DataLoader(
-            dataset=torch.utils.data.TensorDataset(dataset),
+            dataset=torch.utils.data.TensorDataset(self.x),
             batch_size=batch_size,
             shuffle=True
         )
@@ -129,25 +129,24 @@ class Encoder():
 
         # Train the model.
         self.model.train(True)
-        
+        print(f'Training on {self.device}.')
         for epoch in range(epochs):
             for batch in batches:
                 optimizer.zero_grad()
                 loss = loss_fn(
                     batch=batch[0].to(self.device),
                     encoder=self.model,
-                    train=dataset,
+                    train=self.x,
                     save_memory=False if self.device == 'cpu' else True
                 )
                 loss.backward()
                 optimizer.step()
             if verbose:
                 print('epoch: {}, loss: {:,.6f}'.format(1 + epoch, loss))
-
         self.model.train(False)
     
     def predict(self, x):
-    
+        
         '''
         Generate the representations.
         
