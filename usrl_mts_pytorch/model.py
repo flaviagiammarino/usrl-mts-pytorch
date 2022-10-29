@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from sklearn.utils import shuffle
 
 from usrl_mts_pytorch.losses import TripletLoss, TripletLossVaryingLength
 from usrl_mts_pytorch.modules import CausalCNNEncoder
@@ -45,7 +46,7 @@ class Encoder():
         '''
         
         # Shuffle the inputs.
-        x = np.random.permutation(x)
+        x = shuffle(x)
         
         # Scale the inputs.
         self.x_min = np.nanmin(x, axis=0, keepdims=True)
