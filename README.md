@@ -49,9 +49,9 @@ encoder = Encoder(
 
 encoder.fit(
     negative_samples=10,
-    learning_rate=0.01,
-    batch_size=64,
-    epochs=50,
+    learning_rate=0.001,
+    batch_size=32,
+    epochs=100,
     verbose=True
 )
 
