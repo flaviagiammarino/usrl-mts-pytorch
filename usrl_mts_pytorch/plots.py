@@ -32,26 +32,31 @@ def plot(x, y):
         rows=len(c),
         cols=1
     )
-    
+
     fig.update_layout(
         plot_bgcolor='white',
         paper_bgcolor='white',
-        margin=dict(t=40, b=10, l=10, r=10),
+        margin=dict(t=60, b=60, l=30, r=30),
         font=dict(
-            color='#000000',
-            size=10,
+            color='#1b1f24',
+            size=8,
         ),
         legend=dict(
             traceorder='normal',
             font=dict(
-                color='#000000',
+                color='#1b1f24',
+                size=10,
             ),
+            x=0,
+            y=-0.1,
+            orientation='h'
         ),
     )
-    
+
     fig.update_annotations(
         font=dict(
-            size=13
+            color='#1b1f24',
+            size=12,
         )
     )
     
@@ -65,11 +70,12 @@ def plot(x, y):
             fig.add_trace(
                 go.Scatter(
                     y=x_[j, :],
+                    name='Actual',
                     showlegend=False,
                     mode='lines',
                     line=dict(
-                        color='rgba(194, 194, 194, 0.5)',
-                        width=0.1
+                        color='rgba(175,184,193,0.2)',
+                        width=0.5
                     )
                 ),
                 row=i + 1,
@@ -80,12 +86,13 @@ def plot(x, y):
             go.Scatter(
                 y=np.nanmean(x_, axis=0),
                 showlegend=True if i == 0 else False,
-                name='Average',
-                legendgroup='Average',
+                name='Cluster Average',
                 mode='lines',
                 line=dict(
-                    color='rgb(130, 80, 223)',
-                    width=1
+                    color='#cf222e',
+                    width=1,
+                    shape='spline',
+                    dash='dot',
                 )
             ),
             row=i + 1,
@@ -94,11 +101,12 @@ def plot(x, y):
         
         fig.update_xaxes(
             title='Time',
-            color='#000000',
+            color='#424a53',
             tickfont=dict(
-                color='#3a3a3a',
+                color='#6e7781',
+                size=6,
             ),
-            linecolor='#d9d9d9',
+            linecolor='#eaeef2',
             mirror=True,
             showgrid=False,
             row=i + 1,
@@ -107,11 +115,12 @@ def plot(x, y):
         
         fig.update_yaxes(
             title='Value',
-            color='#000000',
+            color='#424a53',
             tickfont=dict(
-                color='#3a3a3a',
+                color='#6e7781',
+                size=6,
             ),
-            linecolor='#d9d9d9',
+            linecolor='#eaeef2',
             mirror=True,
             showgrid=False,
             zeroline=False,
