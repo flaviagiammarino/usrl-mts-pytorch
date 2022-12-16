@@ -1,13 +1,14 @@
 import numpy as np
+from sklearn.model_selection import train_test_split
 from sklearn.cluster import KMeans
 
 from usrl_mts_pytorch.model import Encoder
 from usrl_mts_pytorch.plots import plot
 
-# Generate the time series
+# Generate the data
 N = 60   # number of time series
-C = 5    # number of dimensions of each time series
-L = 200  # number of samples of each time series
+C = 10   # number of dimensions of each time series
+L = 100  # number of samples of each time series
 x = np.zeros((N, C, L))
 t = np.linspace(0, 1, L)
 c = np.cos(2 * np.pi * (10 * t - 0.5))
@@ -16,9 +17,12 @@ x[:N // 3] = 20 + 20 * c + 5 * np.random.normal(size=(N // 3, C, L))
 x[N // 3: 2 * N // 3] = 20 + 20 * s + 5 * np.random.normal(size=(N // 3, C, L))
 x[2 * N // 3:] = 20 + 20 * c + 20 * s + 5 * np.random.normal(size=(N // 3, C, L))
 
-# Fit the encoder to the time series
+# Split the data
+x_train, x_test = train_test_split(x, test_size=0.3)
+
+# Fit the encoder
 encoder = Encoder(
-    x=x,
+    x=x_train,
     blocks=2,
     filters=8,
     kernel_size=3,
@@ -35,12 +39,13 @@ encoder.fit(
 )
 
 # Generate the representations
-z = encoder.predict(x)
+z_train = encoder.predict(x_train)
+z_test = encoder.predict(x_test)
 
 # Fit a clustering algorithm to the representations
 kmeans = KMeans(n_clusters=3)
-kmeans.fit(z)
+kmeans.fit(z_train)
 
-# Plot the clustering results
-fig = plot(x=x, y=kmeans.predict(z))
+# Plot the results
+fig = plot(x=x_test, y=kmeans.predict(z_test))
 fig.write_image('results.png', scale=4, height=900, width=700)

@@ -24,7 +24,7 @@ def plot(x, y):
     '''
 
     # extract the distinct clusters
-    c = np.unique(y)
+    c = np.unique(y).astype(int)
     
     fig = make_subplots(
         subplot_titles=['Cluster ' + str(i + 1) for i in c],
