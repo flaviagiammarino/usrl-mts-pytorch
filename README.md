@@ -1,20 +1,19 @@
 # USRL-MTS PyTorch
 
-![license](https://img.shields.io/github/license/flaviagiammarino/usrl-mts-pytorch?color=9b72e5)
-![languages](https://img.shields.io/github/languages/top/flaviagiammarino/usrl-mts-pytorch?color=3672be)
+![license](https://img.shields.io/github/license/flaviagiammarino/usrl-mts-pytorch)
+![languages](https://img.shields.io/github/languages/top/flaviagiammarino/usrl-mts-pytorch)
 
 PyTorch implementation of unsupervised causal convolutional network encoder with triplet loss for time series representation 
 learning introduced in Franceschi, J.Y., Dieuleveut, A. and Jaggi, M., 2019. Unsupervised scalable representation learning for 
-multivariate time series. *Advances in neural information processing systems*, 32. [arXiv:1901.10738](https://arxiv.org/abs/1901.10738).
-
-Adapted from: [https://github.com/White-Link/UnsupervisedScalableRepresentationLearningTimeSeries](https://github.com/White-Link/UnsupervisedScalableRepresentationLearningTimeSeries).
+multivariate time series. *Advances in neural information processing systems*, 32. 
+Adapted from the [official code repository](https://github.com/White-Link/UnsupervisedScalableRepresentationLearningTimeSeries).
 
 ## Dependencies
 ```bash
-numpy==1.23.1
-torch==1.10.2
-scikit-learn==1.1.2
-plotly==5.9.0
+numpy==1.23.5
+torch==1.13.1
+scikit-learn==1.1.3
+plotly==5.11.0
 kaleido==0.2.1
 ```
 ## Usage
@@ -26,15 +25,16 @@ from usrl_mts_pytorch.model import Encoder
 from usrl_mts_pytorch.plots import plot
 
 # Generate the time series
-N = 50   # number of time series
-C = 10   # number of dimensions of each time series
+N = 60   # number of time series
+C = 5    # number of dimensions of each time series
 L = 200  # number of samples of each time series
 x = np.zeros((N, C, L))
 t = np.linspace(0, 1, L)
 c = np.cos(2 * np.pi * (10 * t - 0.5))
 s = np.sin(2 * np.pi * (20 * t - 0.5))
-x[:N // 2] = 20 + 20 * c + 5 * np.random.normal(size=(N // 2, C, L))
-x[N // 2:] = 30 + 30 * c + 30 * s + 10 * np.random.normal(size=(N // 2, C, L))
+x[:N // 3] = 20 + 20 * c + 5 * np.random.normal(size=(N // 3, C, L))
+x[N // 3: 2 * N // 3] = 20 + 20 * s + 5 * np.random.normal(size=(N // 3, C, L))
+x[2 * N // 3:] = 20 + 20 * c + 20 * s + 5 * np.random.normal(size=(N // 3, C, L))
 
 # Fit the encoder to the time series
 encoder = Encoder(
@@ -58,11 +58,11 @@ encoder.fit(
 z = encoder.predict(x)
 
 # Fit a clustering algorithm to the representations
-kmeans = KMeans(n_clusters=2)
+kmeans = KMeans(n_clusters=3)
 kmeans.fit(z)
 
 # Plot the clustering results
 fig = plot(x=x, y=kmeans.predict(z))
-fig.write_image('results.png', width=750, height=650)
+fig.write_image('results.png', scale=4, height=900, width=700)
 ```
 ![results](example/results.png)
