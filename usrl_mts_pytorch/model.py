@@ -64,7 +64,8 @@ class Encoder():
         )
 
         # Check if the inputs have varying length.
-        self.varying = np.isnan(x).any()
+        if np.isnan(x).any():
+            raise ValueError('Variable length sequences are not yet supported.')
         
         # Check if GPU is available.
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -114,18 +115,11 @@ class Encoder():
         optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
 
         # Define the loss function.
-        if self.varying:
-            loss_fn = TripletLossVaryingLength(
-                nb_random_samples=negative_samples,
-                compared_length=None,
-                negative_penalty=1,
-            )
-        else:
-            loss_fn = TripletLoss(
-                nb_random_samples=negative_samples,
-                compared_length=None,
-                negative_penalty=1,
-            )
+        loss_fn = TripletLoss(
+            nb_random_samples=negative_samples,
+            compared_length=None,
+            negative_penalty=1,
+        )
 
         # Train the model.
         self.model.train(True)
@@ -169,6 +163,6 @@ class Encoder():
         
         # Generate the representations.
         z = self.model(torch.from_numpy(x).to(self.device))
-        z = np.nan_to_num(z.detach().cpu().numpy())
+        z = z.detach().cpu().numpy()
     
         return z
