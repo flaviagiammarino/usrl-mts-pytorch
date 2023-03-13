@@ -45,14 +45,23 @@ class Encoder():
             Length of the output representations.
         '''
         
-        # Shuffle the inputs.
+        # Shuffle the time series.
         x = shuffle(x)
         
-        # Scale the inputs.
+        # Scale the time series.
         self.x_min = np.nanmin(x, axis=0, keepdims=True)
         self.x_max = np.nanmax(x, axis=0, keepdims=True)
         x = (x - self.x_min) / (self.x_max - self.x_min)
- 
+
+        # Check if the time series have varying length.
+        self.varying = np.isnan(x).any()
+        
+        # Move the missing values to the end of the time series.
+        if self.varying:
+            for i in range(x.shape[0]):
+                for j in range(x.shape[1]):
+                    x[i, j, :] = np.append(x[i, j, :][~np.isnan(x[i, j, :])], x[i, j, :][np.isnan(x[i, j, :])])
+
         # Build the model.
         model = CausalCNNEncoder(
             in_channels=x.shape[1],
@@ -62,15 +71,11 @@ class Encoder():
             out_channels=output_length,
             kernel_size=kernel_size
         )
-
-        # Check if the inputs have varying length.
-        if np.isnan(x).any():
-            raise ValueError('Variable length sequences are not yet supported.')
         
         # Check if GPU is available.
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-        # Save the inputs.
+        # Save the time series.
         self.x = torch.from_numpy(x).to(self.device)
 
         # Save the model.
@@ -115,11 +120,18 @@ class Encoder():
         optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)
 
         # Define the loss function.
-        loss_fn = TripletLoss(
-            nb_random_samples=negative_samples,
-            compared_length=None,
-            negative_penalty=1,
-        )
+        if self.varying:
+            loss_fn = TripletLossVaryingLength(
+                nb_random_samples=negative_samples,
+                compared_length=None,
+                negative_penalty=1,
+            )
+        else:
+            loss_fn = TripletLoss(
+                nb_random_samples=negative_samples,
+                compared_length=None,
+                negative_penalty=1,
+            )
 
         # Train the model.
         self.model.train(True)
@@ -158,11 +170,13 @@ class Encoder():
             and output_length is the length of the representations.
         '''
     
-        # Scale the inputs.
+        # Scale the time series.
         x = (x - self.x_min) / (self.x_max - self.x_min)
         
         # Generate the representations.
-        z = self.model(torch.from_numpy(x).to(self.device))
-        z = z.detach().cpu().numpy()
-    
+        if not self.varying:
+            z = self.model(torch.from_numpy(x).to(self.device)).detach().cpu().numpy()
+        else:
+            z = np.squeeze([self.model(torch.from_numpy(x[i, :, :][~np.isnan(x[i, :, :])].reshape(1, x.shape[1], -1)).to(self.device)).detach().cpu().numpy() for i in range(x.shape[0])])
+        
         return z
