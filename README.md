@@ -8,6 +8,10 @@ learning introduced in Franceschi, J.Y., Dieuleveut, A. and Jaggi, M., 2019. Uns
 multivariate time series. *Advances in neural information processing systems*, 32. 
 Adapted from the [official code repository](https://github.com/White-Link/UnsupervisedScalableRepresentationLearningTimeSeries).
 
+<img src=diagram.png style="width:80%;margin-top:30px;margin-bottom:25px"/>
+
+*Model architecture (source: [NEURIPS 2019](https://proceedings.neurips.cc/paper_files/paper/2019/file/53c6de78244e9f528eb3e1cda69699bb-Paper.pdf))*
+
 ## Dependencies
 ```bash
 numpy==1.23.5
