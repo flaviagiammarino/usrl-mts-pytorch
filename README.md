@@ -12,7 +12,7 @@ Adapted from the [official code repository](https://github.com/White-Link/Unsupe
 
 <img src=diagram.png style="width:80%;margin-top:30px;margin-bottom:25px"/>
 
-*Model architecture (source: [NEURIPS 2019](https://proceedings.neurips.cc/paper_files/paper/2019/file/53c6de78244e9f528eb3e1cda69699bb-Paper.pdf))*
+*Model architecture (source: [NeurIPS 2019](https://proceedings.neurips.cc/paper_files/paper/2019/file/53c6de78244e9f528eb3e1cda69699bb-Paper.pdf))*
 
 ## Dependencies
 ```bash
